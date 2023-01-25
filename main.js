@@ -104,7 +104,7 @@ fetch("https://rickandmortyapi.com/api/character/")
           result.textContent = "";
           currentPageNumber.textContent = 1;
           currentPage = 1;
-          prevPageButton.setAttribute('disabled', truegit)
+          prevPageButton.setAttribute('disabled', true)
         });
       }
 
