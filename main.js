@@ -1,11 +1,14 @@
 const output = document.getElementById("output");
 const restoreBtn = document.getElementById("restore-btn");
 
-
 const nextPageButton = document.querySelector(".next");
 const prevPageButton = document.querySelector(".prev");
 let currentPage = 1;
 const currentPageNumber = document.querySelector(".curr-page");
+
+const statusSelect = document.getElementById("status-select");
+
+let dataGlobal = [];
 
 const renderList = (elements) => {
   return elements.reduce((acc, current) => {
@@ -24,90 +27,98 @@ const renderList = (elements) => {
             <button btn-name="delete">Delete Block</button>
         </div>
     </li>`;
-
     return acc;
   }, "");
 };
 
 async function fetchData(pagNum) {
-  const response = await fetch(`https://rickandmortyapi.com/api/character/?page=${pagNum}`)
-  const data = await response.json()
+  const response = await fetch(
+    `https://rickandmortyapi.com/api/character/?page=${pagNum}`
+  );
+  const data = await response.json();
   return data;
 }
 
 nextPageButton.addEventListener("click", () => {
   currentPage++;
   currentPageNumber.textContent = currentPage;
-  fetchData(currentPage)
-    .then((data) => {
-      if(data.info.next === null){
-        nextPageButton.setAttribute('disabled', true);
-      }
-      if(data.info.prev !== null){
-        prevPageButton.removeAttribute('disabled', true);
-      }
-      output.innerHTML = renderList(data.results);  
-
-    });
+  statusSelect.value = 'all'
+  fetchData(currentPage).then((data) => {
+    dataGlobal = data.results;
+    if (data.info.next === null) {
+      nextPageButton.setAttribute("disabled", true);
+    }
+    if (data.info.prev !== null) {
+      prevPageButton.removeAttribute("disabled");
+    }
+    output.innerHTML = renderList(dataGlobal);
+  });
 });
 
 prevPageButton.addEventListener("click", () => {
   currentPage--;
   currentPageNumber.textContent = currentPage;
-  fetchData(currentPage)
-    .then((data) => {
-      console.log(data);
-      if(data.info.next !== null){
-        nextPageButton.removeAttribute('disabled', true);
-      }
-      if(data.info.prev === null){
-        prevPageButton.setAttribute('disabled', true);
-      }
-      output.innerHTML = renderList(data.results);
-    });
+  statusSelect.value = 'all'
+  fetchData(currentPage).then((data) => {
+    dataGlobal = data.results;
+    if (data.info.next !== null) {
+      nextPageButton.removeAttribute("disabled", true);
+    }
+    if (data.info.prev === null) {
+      prevPageButton.setAttribute("disabled", true);
+    }
+    output.innerHTML = renderList(dataGlobal);
+  });
 });
 
-fetch("https://rickandmortyapi.com/api/character/")
-  .then((response) => response.json())
-  .then((data) => {
-    currentPageNumber.textContent = currentPage;
-    output.innerHTML = renderList(data.results);
-    
-    output.addEventListener("click", (e) => {
-      let target = e.target.closest("li");
+fetchData(currentPage).then((data) => {
+  dataGlobal = data.results;
+  currentPageNumber.textContent = currentPage;
+  output.innerHTML = renderList(dataGlobal);
 
-      if (target) {
-        let allLi = document.querySelectorAll("li");
+  output.addEventListener("click", (e) => {
+    let target = e.target.closest("li");
+    if (target) {
+      let allLi = document.querySelectorAll("li");
+      allLi.forEach((li) => {
+        li.classList.remove("active");
+      });
+      target.classList.add("active");
 
-        allLi.forEach((li) => {
-          li.classList.remove("active");
-        });
-        target.classList.add("active");
+      const res = document.querySelector(".res span");
+      res.textContent = target.querySelectorAll("p")[0].textContent;
 
-        const res = document.querySelector(".res span");
-        res.textContent = target.querySelectorAll("p")[0].textContent;
-
-        if (e.target.matches('button[btn-name="delete"]')) {
-          target.remove();
-          res.textContent = "";
-        }
+      if (e.target.matches('button[btn-name="delete"]')) {
+        target.remove();
+        res.textContent = "";
       }
-    });
-
-    restoreBtn.addEventListener("click", () => {
-      const listItems = document.querySelectorAll("li");
-      const result = document.querySelector(".res span");
-
-      if (listItems.length > 0) {
-        listItems.forEach((item) => {
-          item.remove();
-          result.textContent = "";
-          currentPageNumber.textContent = 1;
-          currentPage = 1;
-          prevPageButton.setAttribute('disabled', true)
-        });
-      }
-
-      output.innerHTML = renderList(data.results);
-    });
+    }
   });
+
+  // Функционал SELECT
+  statusSelect.addEventListener("change", (e) => {
+    if (e.target.value === "all") {
+      output.innerHTML = renderList(dataGlobal);
+    } else {
+      const filteredElements = dataGlobal.filter(
+        (element) => element.status === e.target.value
+      );
+      output.innerHTML = renderList(filteredElements);
+    }
+  });
+
+  //Функционал кнопки Restor
+  restoreBtn.addEventListener("click", () => {
+    const listItems = document.querySelectorAll("li");
+    const result = document.querySelector(".res span");
+
+    if (listItems.length > 0) {
+      listItems.forEach((item) => {
+        item.remove();
+        result.textContent = "";
+        statusSelect.value = 'all'
+      });
+    }
+    output.innerHTML = renderList(dataGlobal);
+  });
+});

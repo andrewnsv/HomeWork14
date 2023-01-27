@@ -17,11 +17,18 @@
             <p class="curr-page"></p>
             <button class="next"></button>
           </div>
-          <button id='restore-btn'>Reset all</button>
+          <div class="select-block">
+            <label for="status-select">Выберите статус:</label>
+            <select id="status-select">
+              <option value="all">Все</option>
+              <option value="Alive">Живые</option>
+              <option value="Dead">Мертвые</option>
+              <option value="unknown">Неизвестно</option>
+            </select>
+          </div>
+          <button id="restore-btn">Reset all</button>
         </div>
-        <ul id="output" >
-
-        </ul>
+        <ul id="output"></ul>
       </div>
     </div>
   </body>
