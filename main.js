@@ -11,24 +11,23 @@ const statusSelect = document.getElementById("status-select");
 let dataGlobal = [];
 
 const renderList = (elements) => {
-  return elements.reduce((acc, current) => {
-    acc += `<li>
+  return elements.map(current => 
+  `<li>
     <img src="${current.image}">
-        <div class="wrap-item">
-            <div class='name-content'>Имя:
-                <p>${current.name}</p>
-            </div>
-            <div class='name-content'>Статус:
-                <p> ${current.status}</p>
-            </div>
-            <div class='name-content'>Айди: 
-                <p>${current.id}</p>
-            </div>
-            <button btn-name="delete">Delete Block</button>
+      <div class="wrap-item">
+        <div class='name-content'>Имя:
+            <p>${current.name}</p>
         </div>
-    </li>`;
-    return acc;
-  }, "");
+        <div class='name-content'>Статус:
+            <p> ${current.status}</p>
+        </div>
+        <div class='name-content'>Раса: 
+            <p>${current.species}</p>
+        </div>
+        <button btn-name="delete">Delete Block</button>
+      </div>
+  </li>`
+  ).join('')
 };
 
 async function fetchData(pagNum) {
@@ -39,6 +38,7 @@ async function fetchData(pagNum) {
   return data;
 }
 
+//Кнопка вперед
 nextPageButton.addEventListener("click", () => {
   currentPage++;
   currentPageNumber.textContent = currentPage;
@@ -55,6 +55,7 @@ nextPageButton.addEventListener("click", () => {
   });
 });
 
+//Кнопка назад
 prevPageButton.addEventListener("click", () => {
   currentPage--;
   currentPageNumber.textContent = currentPage;
@@ -71,6 +72,7 @@ prevPageButton.addEventListener("click", () => {
   });
 });
 
+//Первый рендер и выбор LI
 fetchData(currentPage).then((data) => {
   dataGlobal = data.results;
   currentPageNumber.textContent = currentPage;
